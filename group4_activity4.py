@@ -1,4 +1,4 @@
-# Importing the csv module to read the catalogue data
+
 import csv
 
 class Article:
@@ -10,16 +10,16 @@ class Article:
         self.price = price
         self.quantity = quantity
 
-    def getName(self):
+    def get_Name(self):
         return self.name
 
-    def getPrice(self):
+    def get_Price(self):
         return self.price
 
-    def getQuantity(self):
+    def get_Quantity(self):
         return self.quantity
 
-    def setQuantity(self, quantity):
+    def set_Quantity(self, quantity):
         self.quantity = quantity
 
     def __str__(self):
@@ -34,24 +34,14 @@ def read_data(file_path):
     """
     with open(file_path, mode='r', newline='') as csvfile:
         csvreader = csv.reader(csvfile)
-        next(csvreader, None)  # Skip the headers
+        next(csvreader)  # Skip the headers
         for row in csvreader:
-            name, price, quantity = row
-            INVENTORY[name] = Article(name, float(price), int(quantity))
+            name, quantity, price = row
+            INVENTORY[name] = Article(name, float(quantity), int(price))
 
 def display_menu():
-    """
-    Displays the main menu options to the user.
-    """
-    menu = """
-    1. List all items, inventory and price
-    2. List cart shopping items
-    3. Add an item to the shopping cart
-    4. Remove an item from the shopping cart
-    5. Checkout
-    6. Exit
-    """
-    print(menu.strip())
+    print("1. List all items, inventory and price \n2. List cart shopping items \n3. Add an item to the shopping cart \n4. Remove an item from the shopping cart \n5. Checkout \n6. Exit")
+ 
 
 class Cart:
     """
@@ -64,16 +54,16 @@ class Cart:
     def addProduct(self, article_name, quantity):
         if article_name in INVENTORY:
             article = INVENTORY[article_name]
-            if quantity <= article.getQuantity():
+            if quantity <= article.get_Quantity():
                 # Check if article is already in the cart
                 for purchased in self.list_of_purchased:
-                    if purchased.getName() == article_name:
-                        purchased.setQuantity(purchased.getQuantity() + quantity)
-                        article.setQuantity(article.getQuantity() - quantity)
+                    if purchased.get_Name() == article_name:
+                        purchased.set_Quantity(purchased.get_Quantity() + quantity)
+                        article.set_Quantity(article.get_Quantity() - quantity)
                         return
                 # If not in the cart, add new entry
-                self.list_of_purchased.append(Article(article_name, article.getPrice(), quantity))
-                article.setQuantity(article.getQuantity() - quantity)
+                self.list_of_purchased.append(Article(article_name, article.get_Price(), quantity))
+                article.set_Quantity(article.get_Quantity() - quantity)
             else:
                 print(f"Not enough inventory for {article_name}.")
         else:
@@ -81,33 +71,34 @@ class Cart:
 
     def removeProduct(self, article_name, quantity):
         for purchased in self.list_of_purchased:
-            if purchased.getName() == article_name:
-                if quantity < purchased.getQuantity():
-                    purchased.setQuantity(purchased.getQuantity() - quantity)
-                    INVENTORY[article_name].setQuantity(INVENTORY[article_name].getQuantity() + quantity)
-                elif quantity >= purchased.getQuantity():
+            if purchased.get_Name() == article_name:
+                if quantity < purchased.get_Quantity():
+                    purchased.set_Quantity(purchased.get_Quantity() - quantity)
+                    INVENTORY[article_name].set_Quantity(INVENTORY[article_name].get_Quantity() + quantity)
+                elif quantity >= purchased.get_Quantity():
                     self.list_of_purchased.remove(purchased)
-                    INVENTORY[article_name].setQuantity(INVENTORY[article_name].getQuantity() + purchased.getQuantity())
+                    INVENTORY[article_name].set_Quantity(INVENTORY[article_name].get_Quantity() + purchased.get_Quantity())
                 return
-        print(f"Article {article_name} not found in cart.")
+        print(f"Article {article_name}  is not found in your cart.")
 
     def displayCart(self):
         if not self.list_of_purchased:
-            print("Sorry the shopping cart is empty")
+            print("Sorry but your shopping cart is empty")
         else:
             for article in self.list_of_purchased:
                 print(article)
 
     def checkout(self):
-        total = sum(item.getPrice() * item.getQuantity() * (0.9 if item.getQuantity() >= 3 else 1) for item in self.list_of_purchased)
-        total *= 1.07  # Apply 7% VAT
-        print(f"Your bill is {total:.2f}$")
+        total = sum(item.get_Price() * item.get_Quantity() * (0.9 if item.get_Quantity() >= 3 else 1) for item in self.list_of_purchased)
+        total *= 1.07  # Applying 7% VAT
+        print(f"Your bill is ${total:.2f}")
 
 def main():
     """
     The main function to run the shopping cart program.
     """
-    read_data('catalogue.csv')  # Replace with the correct path to the CSV file
+    filename = input("Enter the file path")
+    read_data(filename)  # Replace with the correct path to the CSV file
     cart = Cart()
     while True:
         display_menu()
@@ -118,10 +109,25 @@ def main():
         elif choice == "2":
             cart.displayCart()
         elif choice == "3":
-            article_name = input("Add an item from our catalogue to the shopping cart: ")
+            article_name = input("write the name of an item from our catalogue to the shopping cart: ")
             quantity = int(input(f"Add the quantity of {article_name}: "))
             cart.addProduct(article_name, quantity)
         elif choice == "4":
-            article_name = input("Remove an item from the shopping cart: ")
-            quantity = int(input(f"Remove the quantity of {article_name} from the shopping cart: "))
-            cart.removeProduct(article_name
+            article_name = input("Give the name of the item you want to remove from the shopping cart: ")
+            quantity = int(input(f"Removing the quantity of {article_name} from the shopping cart: "))
+            cart.removeProduct(article_name, quantity)
+        elif choice == "5":
+            cart.checkout()
+        elif choice == "6":
+            print("Thank you for shopping with us!")
+            break
+        else:
+            print("Invalid choice. Please try again.")
+        continue_prompt = input("Do you want to continue? press y if you want to and any other key if not: ").lower()
+        if continue_prompt != 'y':
+            print("Thank you for using our service")
+            break
+            
+
+
+main()
