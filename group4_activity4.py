@@ -89,7 +89,7 @@ class Cart:
                 print(article)
 
     def checkout(self):
-        total = sum(item.get_Price() * item.get_Quantity() * (0.9 if item.get_Quantity() >= 3 else 1) for item in self.list_of_purchased)
+        total = sum(item.get_Price() * item.get_Quantity() * (0.9 if item.get_Quantity() >= 3 else 1) for item in self.list_of_purchased) # 10% Discount if quantity >=3
         total *= 1.07  # Applying 7% VAT
         print(f"Your bill is ${total:.2f}")
 
