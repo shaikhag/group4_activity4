@@ -1,4 +1,6 @@
-
+'''
+Shaikha Alghubash did: the class Article, inventory placeholder, and read data function.
+'''
 import csv
 
 class Article:
